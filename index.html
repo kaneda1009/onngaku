@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>音楽日記アルバム</title>
+    <title>音楽日記サムネイルアルバム</title>
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -106,13 +106,16 @@
             gap: 8px;
         }
 
-        .jacket {
+        .thumb-wrapper {
             width: 100%;
-            height: 190px;
             border-radius: 10px;
+            overflow: hidden;
             margin-bottom: 6px;
-            background-size: cover;
-            background-position: center;
+        }
+
+        .thumb-wrapper img {
+            width: 100%;
+            display: block;
         }
 
         .album-title {
@@ -136,29 +139,25 @@
             margin-top: 4px;
         }
 
-        .youtube-wrapper {
-            margin-top: 8px;
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 10px;
-        }
-
-        .youtube-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
         .empty-message {
             text-align: center;
             color: #777;
             font-size: 14px;
             margin-top: 24px;
+        }
+
+        .youtube-link {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .youtube-link a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .youtube-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -166,7 +165,7 @@
 
 <header>
     <h1>音楽日記アルバム</h1>
-    <p>その日に聴いた音楽と、気持ちを、AI風ジャケットと一緒に残していく。</p>
+    <p>その日に聴いた音楽と気持ちを、YouTubeサムネイルと一緒に残していく。</p>
 </header>
 
 <main>
@@ -179,7 +178,7 @@
         </div>
 
         <div class="form-row">
-            <label for="title">タイトル（例：雨の日の帰り道）</label>
+            <label for="title">タイトル（例：夜の散歩の帰り道）</label>
             <input id="title" type="text" placeholder="その日の象徴になる一言があれば">
         </div>
 
@@ -220,39 +219,6 @@
     const errorText = document.getElementById("error");
     const emptyMessage = document.getElementById("emptyMessage");
 
-    // 🎨 AI風・絵画ジャケット生成（抽象画）
-    function generatePaintingJacket(seedText) {
-        const canvas = document.createElement("canvas");
-        canvas.width = 600;
-        canvas.height = 400;
-        const ctx = canvas.getContext("2d");
-
-        // 背景グラデーション
-        const baseHue = (seedText.length * 23) % 360;
-        const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        grad.addColorStop(0, `hsl(${baseHue}, 70%, 65%)`);
-        grad.addColorStop(1, `hsl(${(baseHue+60)%360}, 70%, 55%)`);
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // 抽象的な“筆跡”レイヤー
-        for (let i = 0; i < 45; i++) {
-            const hue = (baseHue + Math.random()*80 - 40 + 360) % 360;
-            ctx.fillStyle = `hsla(hsl(${hue}, 80%, 60%), 0.25)`;
-            ctx.fillStyle = `hsla(${hue}, 80%, 60%, 0.25)`;
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height;
-            const w = 60 + Math.random() * 220;
-            const h = 30 + Math.random() * 140;
-            ctx.beginPath();
-            ctx.ellipse(x, y, w, h, Math.random()*Math.PI, 0, Math.PI*2);
-            ctx.fill();
-        }
-
-        return canvas.toDataURL("image/png");
-    }
-
-    // YouTube ID 抽出
     function getYouTubeId(url) {
         if (!url) return null;
         const patterns = [
@@ -267,18 +233,29 @@
         return null;
     }
 
+    function getThumbnailUrl(videoId) {
+        return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    }
+
     function updateEmptyMessage() {
         emptyMessage.style.display = albumList.children.length === 0 ? "block" : "none";
     }
 
-    // カード生成
     function createAlbumCard(data) {
         const card = document.createElement("div");
         card.className = "album-card";
 
-        const jacket = document.createElement("div");
-        jacket.className = "jacket";
-        jacket.style.backgroundImage = `url(${data.jacket})`;
+        if (data.youtubeId) {
+            const thumbWrap = document.createElement("div");
+            thumbWrap.className = "thumb-wrapper";
+
+            const img = document.createElement("img");
+            img.src = getThumbnailUrl(data.youtubeId);
+            img.alt = data.musicTitle || "YouTube サムネイル";
+
+            thumbWrap.appendChild(img);
+            card.appendChild(thumbWrap);
+        }
 
         const titleEl = document.createElement("div");
         titleEl.className = "album-title";
@@ -296,21 +273,21 @@
         diaryEl.className = "album-diary";
         diaryEl.textContent = data.diary || "";
 
-        card.appendChild(jacket);
         card.appendChild(titleEl);
         card.appendChild(dateEl);
         card.appendChild(musicEl);
         card.appendChild(diaryEl);
 
-        if (data.youtubeId) {
-            const wrap = document.createElement("div");
-            wrap.className = "youtube-wrapper";
-            const iframe = document.createElement("iframe");
-            iframe.src = `https://www.youtube.com/embed/${data.youtubeId}`;
-            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-            iframe.allowFullscreen = true;
-            wrap.appendChild(iframe);
-            card.appendChild(wrap);
+        if (data.youtubeUrl) {
+            const linkEl = document.createElement("div");
+            linkEl.className = "youtube-link";
+            const a = document.createElement("a");
+            a.href = data.youtubeUrl;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.textContent = "YouTubeで開く";
+            linkEl.appendChild(a);
+            card.appendChild(linkEl);
         }
 
         return card;
@@ -339,10 +316,7 @@
             }
         }
 
-        const seedText = (title || "") + (musicTitle || "") + (diary || "");
-        const jacket = generatePaintingJacket(seedText || "music diary");
-
-        const data = { date, title, musicTitle, diary, youtubeId, jacket };
+        const data = { date, title, musicTitle, diary, youtubeId, youtubeUrl };
         const card = createAlbumCard(data);
 
         albumList.prepend(card);
@@ -360,3 +334,4 @@
 
 </body>
 </html>
+
