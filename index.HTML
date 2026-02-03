@@ -2,45 +2,292 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>サンプルアプリ</title>
+    <title>人生アルバムアプリ</title>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f5f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            padding: 24px 16px;
             text-align: center;
-            margin-top: 80px;
-        }
-        button {
-            padding: 12px 24px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-        #message {
-            margin-top: 30px;
-            font-size: 24px;
             color: #333;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        header p {
+            margin: 8px 0 0;
+            font-size: 14px;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 24px auto 40px;
+            padding: 0 16px;
+        }
+
+        .form-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            margin-bottom: 12px;
+        }
+
+        .form-row label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #555;
+        }
+
+        .form-row input,
+        .form-row textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-row textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 22px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #ff9a9e;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .album-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .album-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px 14px 16px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .album-title {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .album-date {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .album-note {
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+
+        .youtube-wrapper {
+            margin-top: 6px;
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .youtube-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            margin-top: 24px;
         }
     </style>
 </head>
 <body>
 
-    <h1>ミニアプリ</h1>
-    <button onclick="changeMessage()">メッセージを変える</button>
+<header>
+    <h1>あなたの人生アルバム</h1>
+    <p>思い出と、そのとき流れていた音楽を、1枚ずつカードにして残していこう。</p>
+</header>
 
-    <div id="message">こんにちは！</div>
+<main>
+    <section class="form-card">
+        <h2 style="margin-top:0;font-size:18px;">新しい思い出を追加</h2>
 
-    <script>
-        function changeMessage() {
-            const messages = [
-                "こんにちは！",
-                "今日もいい日になりそう。",
-                "がんばってるね！",
-                "HTMLアプリ開発は楽しいよ。",
-                "次はどんな機能をつける？"
-            ];
-            const random = Math.floor(Math.random() * messages.length);
-            document.getElementById("message").textContent = messages[random];
+        <div class="form-row">
+            <label for="title">タイトル（例：高校の文化祭）</label>
+            <input id="title" type="text" placeholder="どんな瞬間だった？">
+        </div>
+
+        <div class="form-row">
+            <label for="date">日付</label>
+            <input id="date" type="date">
+        </div>
+
+        <div class="form-row">
+            <label for="note">メモ・気持ち</label>
+            <textarea id="note" placeholder="そのとき何を感じていた？"></textarea>
+        </div>
+
+        <div class="form-row">
+            <label for="youtubeUrl">YouTube 音楽URL（任意）</label>
+            <input id="youtubeUrl" type="url" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+
+        <button id="addBtn">アルバムに追加</button>
+        <p id="error" style="color:#d33;font-size:12px;margin-top:8px;"></p>
+    </section>
+
+    <section>
+        <h2 style="font-size:18px;margin-bottom:10px;">アルバム</h2>
+        <div id="albumList" class="album-list"></div>
+        <p id="emptyMessage" class="empty-message">まだ何も登録されていません。最初の1枚をつくってみよう。</p>
+    </section>
+</main>
+
+<script>
+    const titleInput = document.getElementById("title");
+    const dateInput = document.getElementById("date");
+    const noteInput = document.getElementById("note");
+    const youtubeInput = document.getElementById("youtubeUrl");
+    const addBtn = document.getElementById("addBtn");
+    const albumList = document.getElementById("albumList");
+    const errorText = document.getElementById("error");
+    const emptyMessage = document.getElementById("emptyMessage");
+
+    function getYouTubeId(url) {
+        if (!url) return null;
+        // 代表的なパターンだけ対応
+        const patterns = [
+            /youtube\.com\/watch\?v=([^&]+)/,
+            /youtu\.be\/([^?&]+)/,
+            /youtube\.com\/embed\/([^?&]+)/
+        ];
+        for (const p of patterns) {
+            const match = url.match(p);
+            if (match && match[1]) return match[1];
         }
-    </script>
+        return null;
+    }
+
+    function createAlbumCard(data) {
+        const card = document.createElement("div");
+        card.className = "album-card";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "album-title";
+        titleEl.textContent = data.title || "タイトルなし";
+
+        const dateEl = document.createElement("div");
+        dateEl.className = "album-date";
+        dateEl.textContent = data.date ? `日付：${data.date}` : "日付：不明";
+
+        const noteEl = document.createElement("div");
+        noteEl.className = "album-note";
+        noteEl.textContent = data.note || "";
+
+        card.appendChild(titleEl);
+        card.appendChild(dateEl);
+        card.appendChild(noteEl);
+
+        if (data.youtubeId) {
+            const wrapper = document.createElement("div");
+            wrapper.className = "youtube-wrapper";
+
+            const iframe = document.createElement("iframe");
+            iframe.src = `https://www.youtube.com/embed/${data.youtubeId}`;
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+            iframe.allowFullscreen = true;
+
+            wrapper.appendChild(iframe);
+            card.appendChild(wrapper);
+        }
+
+        return card;
+    }
+
+    function updateEmptyMessage() {
+        if (albumList.children.length === 0) {
+            emptyMessage.style.display = "block";
+        } else {
+            emptyMessage.style.display = "none";
+        }
+    }
+
+    addBtn.addEventListener("click", () => {
+        errorText.textContent = "";
+
+        const title = titleInput.value.trim();
+        const date = dateInput.value;
+        const note = noteInput.value.trim();
+        const youtubeUrl = youtubeInput.value.trim();
+
+        if (!title && !note) {
+            errorText.textContent = "タイトルかメモのどちらかは入力してみて。";
+            return;
+        }
+
+        let youtubeId = null;
+        if (youtubeUrl) {
+            youtubeId = getYouTubeId(youtubeUrl);
+            if (!youtubeId) {
+                errorText.textContent = "YouTube のURLとして認識できませんでした。もう一度確認してみて。";
+                return;
+            }
+        }
+
+        const data = { title, date, note, youtubeId };
+        const card = createAlbumCard(data);
+        albumList.prepend(card); // 新しい思い出を先頭に
+
+        titleInput.value = "";
+        dateInput.value = "";
+        noteInput.value = "";
+        youtubeInput.value = "";
+
+        updateEmptyMessage();
+    });
+
+    updateEmptyMessage();
+</script>
 
 </body>
 </html>
