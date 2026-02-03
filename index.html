@@ -3,124 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>音楽日記アルバム</title>
-    <style>
-        body {
-            font-family: system-ui, sans-serif;
-            background: #f5f5f7;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
-            padding: 24px 16px;
-            text-align: center;
-            color: #333;
-        }
-
-        main {
-            max-width: 960px;
-            margin: 24px auto;
-            padding: 0 16px;
-        }
-
-        .form-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            margin-bottom: 24px;
-        }
-
-        .form-row {
-            margin-bottom: 12px;
-        }
-
-        .form-row label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 4px;
-            color: #555;
-        }
-
-        .form-row input,
-        .form-row textarea {
-            width: 100%;
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-        }
-
-        .form-row textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        button {
-            border: none;
-            border-radius: 999px;
-            padding: 10px 22px;
-            font-size: 14px;
-            cursor: pointer;
-            background: #ff9a9e;
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .album-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-        }
-
-        .album-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 14px;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-        }
-
-        .thumb-wrapper {
-            width: 100%;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-
-        .thumb-wrapper img {
-            width: 100%;
-            display: block;
-        }
-
-        .album-title {
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .album-date {
-            font-size: 12px;
-            color: #777;
-        }
-
-        .album-music {
-            font-size: 13px;
-            color: #444;
-        }
-
-        .album-diary {
-            font-size: 13px;
-            white-space: pre-wrap;
-            margin-top: 4px;
-        }
-
-        .empty-message {
-            text-align: center;
-            color: #777;
-            margin-top: 24px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -131,7 +14,7 @@
 
 <main>
     <section class="form-card">
-        <h2 style="margin-top:0;font-size:18px;">今日の記録を追加</h2>
+        <h2>今日の記録を追加</h2>
 
         <div class="form-row">
             <label>日付</label>
@@ -159,132 +42,16 @@
         </div>
 
         <button id="addBtn">追加する</button>
-        <p id="error" style="color:#d33;font-size:12px;"></p>
+        <p id="error" class="error"></p>
     </section>
 
     <section>
-        <h2 style="font-size:18px;">音楽日記一覧</h2>
+        <h2>音楽日記一覧</h2>
         <div id="albumList" class="album-list"></div>
         <p id="emptyMessage" class="empty-message">まだ記録がありません。</p>
     </section>
 </main>
 
-<script>
-    const dateInput = document.getElementById("date");
-    const titleInput = document.getElementById("title");
-    const musicTitleInput = document.getElementById("musicTitle");
-    const youtubeInput = document.getElementById("youtubeUrl");
-    const diaryInput = document.getElementById("diary");
-    const addBtn = document.getElementById("addBtn");
-    const albumList = document.getElementById("albumList");
-    const errorText = document.getElementById("error");
-    const emptyMessage = document.getElementById("emptyMessage");
-
-    function getYouTubeId(url) {
-        if (!url) return null;
-        const patterns = [
-            /youtube\.com\/watch\?v=([^&]+)/,
-            /youtu\.be\/([^?&]+)/,
-            /youtube\.com\/embed\/([^?&]+)/
-        ];
-        for (const p of patterns) {
-            const match = url.match(p);
-            if (match) return match[1];
-        }
-        return null;
-    }
-
-    function getThumbnailUrl(id) {
-        return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-    }
-
-    function updateEmptyMessage() {
-        emptyMessage.style.display = albumList.children.length === 0 ? "block" : "none";
-    }
-
-    function createAlbumCard(data) {
-        const card = document.createElement("div");
-        card.className = "album-card";
-
-        if (data.youtubeId) {
-            const thumbWrap = document.createElement("div");
-            thumbWrap.className = "thumb-wrapper";
-
-            const img = document.createElement("img");
-            img.src = getThumbnailUrl(data.youtubeId);
-
-            thumbWrap.appendChild(img);
-
-            // ★ サムネクリックで YouTube 再生ページへ
-            thumbWrap.addEventListener("click", () => {
-                window.open(`https://www.youtube.com/watch?v=${data.youtubeId}`, "_blank");
-            });
-
-            card.appendChild(thumbWrap);
-        }
-
-        const titleEl = document.createElement("div");
-        titleEl.className = "album-title";
-        titleEl.textContent = data.title || "タイトルなし";
-
-        const dateEl = document.createElement("div");
-        dateEl.className = "album-date";
-        dateEl.textContent = data.date ? `日付：${data.date}` : "";
-
-        const musicEl = document.createElement("div");
-        musicEl.className = "album-music";
-        musicEl.textContent = data.musicTitle ? `♪ ${data.musicTitle}` : "";
-
-        const diaryEl = document.createElement("div");
-        diaryEl.className = "album-diary";
-        diaryEl.textContent = data.diary || "";
-
-        card.appendChild(titleEl);
-        card.appendChild(dateEl);
-        card.appendChild(musicEl);
-        card.appendChild(diaryEl);
-
-        return card;
-    }
-
-    addBtn.addEventListener("click", () => {
-        errorText.textContent = "";
-
-        const date = dateInput.value;
-        const title = titleInput.value.trim();
-        const musicTitle = musicTitleInput.value.trim();
-        const youtubeUrl = youtubeInput.value.trim();
-        const diary = diaryInput.value.trim();
-
-        if (!title && !musicTitle && !diary) {
-            errorText.textContent = "タイトル・音楽・日記のどれか1つは入力してね。";
-            return;
-        }
-
-        let youtubeId = null;
-        if (youtubeUrl) {
-            youtubeId = getYouTubeId(youtubeUrl);
-            if (!youtubeId) {
-                errorText.textContent = "YouTube URLが正しくありません。";
-                return;
-            }
-        }
-
-        const data = { date, title, musicTitle, diary, youtubeId };
-        const card = createAlbumCard(data);
-
-        albumList.prepend(card);
-        updateEmptyMessage();
-
-        dateInput.value = "";
-        titleInput.value = "";
-        musicTitleInput.value = "";
-        youtubeInput.value = "";
-        diaryInput.value = "";
-    });
-
-    updateEmptyMessage();
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
