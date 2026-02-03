@@ -1,0 +1,121 @@
+body {
+    font-family: system-ui, sans-serif;
+    background: #f5f5f7;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    padding: 24px 16px;
+    text-align: center;
+    color: #333;
+}
+
+main {
+    max-width: 960px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+.form-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    margin-bottom: 24px;
+}
+
+.form-row {
+    margin-bottom: 12px;
+}
+
+.form-row label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: #555;
+}
+
+.form-row input,
+.form-row textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.form-row textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+button {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #ff9a9e;
+    color: #fff;
+    font-weight: 600;
+}
+
+.album-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.album-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.thumb-wrapper {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.thumb-wrapper img {
+    width: 100%;
+    display: block;
+}
+
+.album-title {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.album-date {
+    font-size: 12px;
+    color: #777;
+}
+
+.album-music {
+    font-size: 13px;
+    color: #444;
+}
+
+.album-diary {
+    font-size: 13px;
+    white-space: pre-wrap;
+    margin-top: 4px;
+}
+
+.empty-message {
+    text-align: center;
+    color: #777;
+    margin-top: 24px;
+}
+
+.error {
+    color: #d33;
+    font-size: 12px;
+}
